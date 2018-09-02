@@ -1,0 +1,20 @@
+{
+  "name": "PrimeInterworkApiCallback",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "run-local-lambda --file index.js --event tests/event.json",
+    "deploy": "aws lambda --region ap-northeast-2 --profile meshdev update-function-code --function-name arn:aws:lambda:ap-northeast-2:540137478950:function:PrimeInterworkApiCallback --zip-file fileb://Lambda-Deployment.zip",
+    "predeploy": "zip -r Lambda-Deployment.zip * -x *.zip *.json *.log"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "run-local-lambda": "^1.1.1"
+  },
+  "dependencies": {
+    "moment-timezone": "^0.5.21",
+    "redis": "^2.8.0"
+  }
+}
