@@ -8,41 +8,41 @@ const cacheHost = process.env.CACHE_HOST ? process.env.CACHE_HOST : '127.0.0.1';
 const cacheClient = redis.createClient(cachePort, cacheHost);
 
 exports.handler = async (event) => {
-    const requestData = JSON.stringify(event, null, 2);
 
-    const responseDummies = {
-        "core": {
-            "default": {
-                "result": "SUCCESS",
-                "error_message": ""
-            }
+    console.log('retrieving cache of ' + cacheKey);
+    let responseData = {};
+
+    // async function func (cacheKey) {
+    //     return cacheClient.lrange(cacheKey, 0, 100, function (err, data) {
+    //         if (err) {
+    //             console.log("error: " + err);
+    //             return;
+    //         }
+    //         console.log("data: " + data);
+    //         responseData = data;
+    //     });
+    // };
+    function squareOfNumberAfter2Seconds(number) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(number * number)
+            }, 2000)
+        })
+    }
+    async function calculate() {
+        try {
+            let responseOne = await squareOfNumberAfter2Seconds(10);
+            return responseOne;
         }
-    };
-
-    //다른 response를 보내야 할 때 이곳을 수정할 것
-    const responseData = responseDummies.core.default;
-
-    const cacheValue = JSON.stringify({
-        "created_at" : moment().tz("Asia/Seoul").format(),
-        "request" : requestData,
-        "response" : responseData
-    }, null, 2);
-
-    //for checking on CloudWatch
-    console.log('Received event: ', requestData);
+        catch(error) {
+            return error;
+        }
+    }
 
     //for checking on Dev Console
-    cacheClient.lpush(cacheKey, cacheValue, function (err, data) {
-        if (err) {
-            console.log("error: " + err);
-            return;
-        }
+    const result = await calculate();
 
-        const expireAfter = 60 * 60 * 24 * 3;
-        cacheClient.expire(cacheKey, expireAfter);
-
-        console.log(expireAfter + "-second-life cached: " + cacheValue);
-    });
+    console.log("result: " + result);
 
     return responseData;
 };
